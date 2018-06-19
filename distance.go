@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
@@ -13,13 +14,22 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type resultPoint struct {
-	destination       string
-	durationGroup     int
-	status            string
-	duration          time.Duration
-	durationInTraffic time.Duration
-	distanceMetres    int
+// ResultPoint is contains the result for one point in the /distances call
+type ResultPoint struct {
+	Destination       maps.LatLng   `json:"destination,omitempty"`
+	DurationGroup     int           `json:"durationGroup,omitempty"`
+	Status            string        `json:"status,omitempty"`
+	Duration          time.Duration `json:"duration,omitempty"`
+	DurationInTraffic time.Duration `json:"durationInTraffic,omitempty"`
+	DistanceMetres    int           `json:"distanceMetres,omitempty"`
+}
+
+// DistanceResponse is the API response from the /distances call
+type DistanceResponse struct {
+	StatusCode    int           `json:"statusCode,omitempty"`
+	StatusMessage string        `json:"statusMessage,omitempty"`
+	Origin        maps.LatLng   `json:"origin,omitempty"`
+	Points        []ResultPoint `json:"points,omitempty"`
 }
 
 // TODO: Come up with a better name and interface signature
@@ -37,15 +47,24 @@ func newDistance(env *Environment) *distance {
 
 func (d *distance) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	// TODO: Take originInput from querystring
-	d.generateDistances("52.920279,-1.469559")
+	result := d.generateDistances("52.920279,-1.469559")
 
-	response.Header().Set("Content-Type", "text/plain")
-	response.WriteHeader(200)
-	response.Write([]byte("TODO"))
+	jsonBytes, err := json.Marshal(result)
+	if err != nil {
+		response.Header().Set("Content-Type", "application/json")
+		response.WriteHeader(500)
+		response.Write([]byte("Internal error marshalling JSON response"))
+	} else {
+		response.Header().Set("Content-Type", "application/json")
+		response.WriteHeader(result.StatusCode)
+		response.Write(jsonBytes)
+	}
 }
 
-// TODO: needs to return a value!
-func (d *distance) generateDistances(originInput string) {
+func (d *distance) generateDistances(originInput string) DistanceResponse {
+
+	response := DistanceResponse{}
+
 	origin, err := maps.ParseLatLng(originInput)
 	if err != nil {
 
@@ -54,8 +73,13 @@ func (d *distance) generateDistances(originInput string) {
 			"err":         err,
 		}).Error("Error parsing input")
 
-		return // TODO: Return something so the API can yield a 400 response
+		response.StatusCode = 400
+		response.StatusMessage = "Error parsing origin"
+
+		return response
 	}
+
+	response.Origin = origin
 
 	log.WithFields(log.Fields{
 		"origin": origin,
@@ -86,20 +110,24 @@ func (d *distance) generateDistances(originInput string) {
 	gridMinLng := rounded.Lng - degrees
 	gridMaxLng := rounded.Lng + degrees
 
-	var destinations []string
+	var gridPoints []maps.LatLng
 
+	// TODO: Investigate a spiral of points instead of a grid
 	for lat := gridMinLat; lat < gridMaxLat; lat += gridSize {
 		for lng := gridMinLng; lng < gridMaxLng; lng += gridSize {
-			destinations = append(destinations, fmt.Sprintf("%f,%f", lat, lng))
+			gridPoints = append(gridPoints, maps.LatLng{
+				Lat: lat,
+				Lng: lng,
+			})
 		}
 	}
 
 	log.WithFields(log.Fields{
-		"origin":            origin,
-		"rounded":           rounded,
-		"len(destinations)": len(destinations),
-		"degrees":           degrees,
-		"gridSize":          gridSize,
+		"origin":          origin,
+		"rounded":         rounded,
+		"len(gridPoints)": len(gridPoints),
+		"degrees":         degrees,
+		"gridSize":        gridSize,
 	}).Debug("Calculated grid")
 
 	client, err := maps.NewClient(maps.WithAPIKey(d.env.GoogleAPIKey))
@@ -109,7 +137,16 @@ func (d *distance) generateDistances(originInput string) {
 			"err":         err,
 		}).Error("Error creating Google API client")
 
-		return // TODO: Return something so the API can yield a 500 response
+		response.StatusCode = 500
+		response.StatusMessage = "Internal error creating Google API client"
+
+		return response
+	}
+
+	var destinations []string
+
+	for _, val := range gridPoints {
+		destinations = append(destinations, fmt.Sprintf("%f,%f", val.Lat, val.Lng))
 	}
 
 	r := &maps.DistanceMatrixRequest{}
@@ -134,33 +171,40 @@ func (d *distance) generateDistances(originInput string) {
 			"err":         err,
 		}).Error("Error calling DistanceMatrix")
 
-		return // TODO: Return something so the API can yield a 500 response
+		response.StatusCode = 500
+		response.StatusMessage = "Internal error calling Google API"
+
+		return response
 	}
 
-	var results []resultPoint
+	var results []ResultPoint
 
-	for i := 0; i < len(destinations); i++ {
+	for i := 0; i < len(gridPoints); i++ {
 		elem := resp.Rows[0].Elements[i]
 
-		results = append(results, resultPoint{
-			destination:       destinations[i],
-			status:            elem.Status,
-			duration:          elem.Duration,
-			durationInTraffic: elem.DurationInTraffic,
-			distanceMetres:    elem.Distance.Meters,
-			durationGroup:     calcDurationGroup(elem),
+		results = append(results, ResultPoint{
+			Destination:       gridPoints[i],
+			Status:            elem.Status,
+			Duration:          elem.Duration,
+			DurationInTraffic: elem.DurationInTraffic,
+			DistanceMetres:    elem.Distance.Meters,
+			DurationGroup:     calcDurationGroup(elem),
 		})
 	}
 
 	// sort by durationGroup
-	sort.Slice(results, func(i, j int) bool { return results[i].durationGroup < results[j].durationGroup })
+	sort.Slice(results, func(i, j int) bool { return results[i].DurationGroup < results[j].DurationGroup })
 
 	log.WithFields(log.Fields{
 		"originInput": originInput,
 		"results":     results,
 	}).Debug("Result points")
 
-	// TODO: return data that the API can pass back to client
+	response.StatusCode = 200
+	response.StatusMessage = "OK"
+	response.Points = results
+
+	return response
 }
 
 func calcDurationGroup(elem *maps.DistanceMatrixElement) int {
