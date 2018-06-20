@@ -25,7 +25,8 @@ type Environment struct {
 
 	// IncDebugHandlers specifies whether to add pprof HTTP endpoints.
 	// Use 0: false, 1: true. Default is false.
-	IncDebugHandlers bool
+	IncDebugHandlersValue string
+	IncDebugHandlers      bool
 }
 
 // NewEnvironment creates an Environment pointer
@@ -45,6 +46,7 @@ func NewEnvironment() *Environment {
 	}
 
 	if incDebugHandlers, hasIncDebug := os.LookupEnv(incDebugHandlersEnvVarName); hasIncDebug {
+		env.IncDebugHandlersValue = incDebugHandlers
 		env.IncDebugHandlers = incDebugHandlers == "1"
 	}
 
@@ -59,6 +61,6 @@ func (e *Environment) LogVariables() {
 		logLevelEnvVarName:         e.LogLevel,
 		portEnvVarName:             e.Port,
 		googleAPIKeyEnvVarName:     e.GoogleAPIKey,
-		incDebugHandlersEnvVarName: e.IncDebugHandlers,
+		incDebugHandlersEnvVarName: e.IncDebugHandlersValue,
 	}).Info("Environment variables")
 }
