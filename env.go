@@ -18,7 +18,7 @@ type Environment struct {
 	// LogLevel is the logging level to output to console
 	// Supported values: Debug, Info, Warn, Error.  Default is Info
 	LogLevel string
-	// Port is the HTTP port to start the server on.  Default is 8080
+	// Port is the HTTP port to start the server on.  Default is 80
 	Port string
 	// GoogleAPIKey must be set to a valid key for calling the Distance Matrix API
 	GoogleAPIKey string
@@ -33,7 +33,7 @@ type Environment struct {
 func NewEnvironment() *Environment {
 	env := &Environment{
 		LogLevel:         "Info",
-		Port:             "8080",
+		Port:             "80",
 		IncDebugHandlers: false,
 	}
 
