@@ -1,5 +1,11 @@
-FROM alpine:3.7
-COPY howfarcaniget.exe /app/
+FROM golang:alpine as builder
+RUN mkdir /build 
+ADD . /build/
+WORKDIR /build 
+RUN go get -d
+RUN go build -o main .
+FROM alpine
+COPY --from=builder /build/main /app/
 WORKDIR /app
-ENTRYPOINT ["howfarcaniget.exe"]
+CMD ["./main"]
 EXPOSE 80
