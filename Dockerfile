@@ -1,11 +1,12 @@
 FROM golang as builder
-RUN mkdir /build 
-ADD . /build/
-WORKDIR /build 
-RUN go get -d
-RUN go build -o main .
+ADD . /go/src/github.com/iandykes/howfarcaniget
+RUN go install github.com/iandykes/howfarcaniget
+
 FROM alpine
-COPY --from=builder /build/main /app/
-WORKDIR /app
-CMD ["./main"]
+COPY --from=builder /go/bin/howfarcaniget /app/
+
+ENV LOG_LEVEL Debug
+ENV INCLUDE_DEBUG_HANDLERS 1
+
+ENTRYPOINT /app/howfarcaniget
 EXPOSE 80
