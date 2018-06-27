@@ -1,6 +1,6 @@
 FROM golang as builder
 ADD . /go/src/github.com/iandykes/howfarcaniget
-RUN go install github.com/iandykes/howfarcaniget
+RUN go install -i github.com/iandykes/howfarcaniget
 
 FROM alpine
 COPY --from=builder /go/bin/howfarcaniget /app/
