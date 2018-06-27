@@ -1,9 +1,9 @@
 FROM golang as builder
 ADD . /go/src/github.com/iandykes/howfarcaniget
-RUN go install -i github.com/iandykes/howfarcaniget
+RUN cd /go/src/github.com/iandykes/howfarcaniget && go get && go build
 
 FROM alpine
-COPY --from=builder /go/bin/howfarcaniget /app/
+COPY --from=builder /go/src/github.com/iandykes/howfarcaniget/howfarcaniget /app/
 
 ENV LOG_LEVEL Debug
 ENV INCLUDE_DEBUG_HANDLERS 1
