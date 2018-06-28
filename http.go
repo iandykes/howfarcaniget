@@ -23,6 +23,7 @@ func NewService(env *Environment) *Service {
 		Distance: newDistance(env),
 	}
 
+	service.Mux.Handle("/", http.FileServer(http.Dir("static")))
 	// TODO: This will change when API is designed
 	service.Mux.Handle("/distances", service.Distance)
 
