@@ -34,7 +34,7 @@ func NewService(env *Environment) *Service {
 		IdleTimeout:  time.Second * 60,
 	}
 
-	if env.LogLevel == "Debug" {
+	if env.HTTPLoggingEnabled {
 		httpLogger := &HTTPLogWriter{}
 
 		service.HTTPServer.Handler = handlers.LoggingHandler(httpLogger, service.Mux)

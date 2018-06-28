@@ -7,10 +7,11 @@ import (
 )
 
 const (
-	logLevelEnvVarName         = "LOG_LEVEL"
-	portEnvVarName             = "HTTP_PORT"
-	googleAPIKeyEnvVarName     = "GOOGLE_API_KEY"
-	incDebugHandlersEnvVarName = "INCLUDE_DEBUG_HANDLERS"
+	logLevelEnvVarName           = "LOG_LEVEL"
+	portEnvVarName               = "PORT"
+	googleAPIKeyEnvVarName       = "GOOGLE_API_KEY"
+	incDebugHandlersEnvVarName   = "INCLUDE_DEBUG_HANDLERS"
+	httpLoggingEnabledEnvVarName = "HTTP_LOGGING_ENABLED"
 )
 
 // Environment contains the environment variables for the app
@@ -27,14 +28,19 @@ type Environment struct {
 	// Use 0: false, 1: true. Default is false.
 	IncDebugHandlersValue string
 	IncDebugHandlers      bool
+
+	// HttpLoggingEnabledValue - 0 or 1 for logging HTTP values
+	HTTPLoggingEnabledValue string
+	HTTPLoggingEnabled      bool
 }
 
 // NewEnvironment creates an Environment pointer
 func NewEnvironment() *Environment {
 	env := &Environment{
-		LogLevel:         "Info",
-		Port:             "80",
-		IncDebugHandlers: false,
+		LogLevel:           "Info",
+		Port:               "80",
+		IncDebugHandlers:   false,
+		HTTPLoggingEnabled: false,
 	}
 
 	if level, hasLevel := os.LookupEnv(logLevelEnvVarName); hasLevel {
@@ -50,6 +56,11 @@ func NewEnvironment() *Environment {
 		env.IncDebugHandlers = incDebugHandlers == "1"
 	}
 
+	if httpLogging, hasHTTPLogging := os.LookupEnv(httpLoggingEnabledEnvVarName); hasHTTPLogging {
+		env.HTTPLoggingEnabledValue = httpLogging
+		env.IncDebugHandlers = httpLogging == "1"
+	}
+
 	env.GoogleAPIKey = os.Getenv(googleAPIKeyEnvVarName)
 
 	return env
@@ -58,9 +69,10 @@ func NewEnvironment() *Environment {
 // LogVariables dumps the current variables to log
 func (e *Environment) LogVariables() {
 	log.WithFields(log.Fields{
-		logLevelEnvVarName:         e.LogLevel,
-		portEnvVarName:             e.Port,
-		googleAPIKeyEnvVarName:     e.GoogleAPIKey,
-		incDebugHandlersEnvVarName: e.IncDebugHandlersValue,
+		logLevelEnvVarName:           e.LogLevel,
+		portEnvVarName:               e.Port,
+		googleAPIKeyEnvVarName:       e.GoogleAPIKey,
+		incDebugHandlersEnvVarName:   e.IncDebugHandlersValue,
+		httpLoggingEnabledEnvVarName: e.HTTPLoggingEnabledValue,
 	}).Info("Environment variables")
 }

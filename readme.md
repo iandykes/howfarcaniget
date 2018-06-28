@@ -13,5 +13,6 @@ Check env.go for full details.  Summary:
 
   * GOOGLE_API_KEY - Mandatory.
   * LOG_LEVEL - Supported values: Debug, Info, Warn, Error.  Default is Info
-  * HTTP_PORT - Default is 80
+  * PORT - Default is 80
   * INCLUDE_DEBUG_HANDLERS - 0 or 1. Whether to add pprof HTTP endpoints. Default is 0
+	* HTTP_LOGGING_ENABLED - 0 or 1. Whether to log HTTP calls at Debug level. Default is 0
