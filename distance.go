@@ -92,7 +92,7 @@ func (d *distance) generateDistances(originInput string) DistanceResponse {
 	log.WithFields(log.Fields{
 		"origin":  origin,
 		"rounded": rounded,
-	}).Debug("Applied rouding on origin")
+	}).Debug("Applied rounding on origin")
 
 	// TODO: based on the value of x in "how far can I go in x hours", need to set degrees and gridSize to
 	// produce total destinations not exceeding the maximum (maybe 100? 64 is fine, 156 is not)

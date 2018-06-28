@@ -58,7 +58,7 @@ func NewEnvironment() *Environment {
 
 	if httpLogging, hasHTTPLogging := os.LookupEnv(httpLoggingEnabledEnvVarName); hasHTTPLogging {
 		env.HTTPLoggingEnabledValue = httpLogging
-		env.IncDebugHandlers = httpLogging == "1"
+		env.HTTPLoggingEnabled = httpLogging == "1"
 	}
 
 	env.GoogleAPIKey = os.Getenv(googleAPIKeyEnvVarName)
