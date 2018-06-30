@@ -4,20 +4,55 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-	<title>How Far Can I Get?</title>
-
-	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <!--[if lt IE 9]>
-      <script src="//oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
+	  <title>How Far Can I Get?</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
   </head>
   <body>
-    <h1>How Far Can I Get?</h1>
-
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-10 offset-sm-1">
+          <h1 class="text-center">How Far Can I Get?</h1>
+          <p class="text-center">
+            Enter your start location and number of hours you want to drive, and see how far you can get.
+          </p>
+        </div>
+      </div>
+      <div class="row">
+          <div class="col-sm-2 offset-sm-2 text-right">
+            <select class="form-control"  disabled>
+              <option value="1">1 hour</option>
+              <option value="2">2 hours</option>
+              <option value="3" selected>3 hours</option>
+              <option value="4">4 hours</option>
+              <option value="5">5 hours</option>
+              <option value="6">6 hours</option>
+              <option value="17">7 hours</option>
+              <option value="18">8 hours</option>
+              <option value="19">9 hours</option>
+              <option value="10">10 hours</option>
+              <option value="11">11 hours</option>
+              <option value="12">12 hours</option>
+              <option value="13">13 hours</option>
+              <option value="14">14 hours</option>
+            </select>      
+          </div>
+          <div class="col-sm-4">
+            <input type="search" name="search" id="txtSearch" class="form-control" placeholder="Enter start location" autofocus disabled/>      
+          </div>
+          <div class="col-sm-2">
+              <button id="btnSubmit" class="btn btn-primary form-control">Go</button>      
+            </div>
+      </div>
+    </div>
+    <div id="map"></div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>  
+    <script src="/js/app.js"></script>
+    
+    <!--TODO: Set Key -->
+    <script src="//maps.googleapis.com/maps/api/js?key=REDACTED&callback=initMap"
+    async defer></script>
   </body>
 </html>
