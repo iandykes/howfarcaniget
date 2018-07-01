@@ -10,6 +10,7 @@ const (
 	logLevelEnvVarName           = "LOG_LEVEL"
 	portEnvVarName               = "PORT"
 	googleAPIKeyEnvVarName       = "GOOGLE_API_KEY"
+	googleMapsKeyEnvVarName      = "GOOGLE_MAPS_KEY"
 	incDebugHandlersEnvVarName   = "INCLUDE_DEBUG_HANDLERS"
 	httpLoggingEnabledEnvVarName = "HTTP_LOGGING_ENABLED"
 )
@@ -23,6 +24,8 @@ type Environment struct {
 	Port string
 	// GoogleAPIKey must be set to a valid key for calling the Distance Matrix API
 	GoogleAPIKey string
+	// GoogleMapsKey is the HTTP referrer restricted API key for client side maps scripts
+	GoogleMapsKey string
 
 	// IncDebugHandlers specifies whether to add pprof HTTP endpoints.
 	// Use 0: false, 1: true. Default is false.
@@ -61,6 +64,7 @@ func NewEnvironment() *Environment {
 		env.HTTPLoggingEnabled = httpLogging == "1"
 	}
 
+	env.GoogleMapsKey = os.Getenv(googleMapsKeyEnvVarName)
 	env.GoogleAPIKey = os.Getenv(googleAPIKeyEnvVarName)
 
 	return env
@@ -72,6 +76,7 @@ func (e *Environment) LogVariables() {
 		logLevelEnvVarName:           e.LogLevel,
 		portEnvVarName:               e.Port,
 		googleAPIKeyEnvVarName:       e.GoogleAPIKey,
+		googleMapsKeyEnvVarName:      e.GoogleMapsKey,
 		incDebugHandlersEnvVarName:   e.IncDebugHandlersValue,
 		httpLoggingEnabledEnvVarName: e.HTTPLoggingEnabledValue,
 	}).Info("Environment variables")

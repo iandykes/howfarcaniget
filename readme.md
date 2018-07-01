@@ -11,7 +11,8 @@ Project is very experimental at this point and the API will not be stable until 
 ## Environment Variables
 Check env.go for full details.  Summary:
 
-  * GOOGLE_API_KEY - Mandatory.
+  * GOOGLE_API_KEY - Mandatory - Key for server side API calls.
+  * GOOGLE_MAPS_KEY - Mandatory - Client side Google Maps script API key. Should be usage restricted.
   * LOG_LEVEL - Supported values: Debug, Info, Warn, Error.  Default is Info
   * PORT - Default is 80
   * INCLUDE_DEBUG_HANDLERS - 0 or 1. Whether to add pprof HTTP endpoints. Default is 0
