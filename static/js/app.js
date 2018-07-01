@@ -42,10 +42,25 @@ function deleteMarkers() {
     markers = [];
 }
 
+function hideTitleCard() {
+   $("#titleCard").fadeOut();
+   $("#searchAgainBox").fadeIn();
+}
+
+function showTitleCard() {
+    $("#titleCard").fadeIn();
+    $("#searchAgainBox").fadeOut();
+ }
+
 $("#btnSubmit").on('click', function () {
     deleteMarkers();
+    hideTitleCard();
     // TODO: Get start location and hours selected
     $.getJSON("/distances", function(result){
         showResult(result);
     });
+});
+
+$("#btnSearchAgain").click(function(){
+    showTitleCard();
 });

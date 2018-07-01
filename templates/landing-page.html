@@ -9,18 +9,22 @@
     <link rel="stylesheet" href="/static/css/style.css">
   </head>
   <body>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-10 offset-sm-1">
-          <h1 class="text-center">How Far Can I Get?</h1>
-          <p class="text-center">
-            Enter your start location and number of hours you want to drive, and see how far you can get.
-          </p>
-        </div>
+    <div id="searchAgainBox">
+      <button id="btnSearchAgain" class="btn btn-primary">Search again</button>
+    </div>
+    
+    <div id="titleCard" class="card">
+      <div class="card-header">
+        How Far Can I Get?
       </div>
-      <div class="row">
-          <div class="col-sm-2 offset-sm-2 text-right">
-            <select class="form-control"  disabled>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-5">
+            <input type="search" name="search" id="txtSearch" class="form-control" placeholder="Start location" autofocus disabled/>      
+          </div>
+          
+          <div class="col-sm-4">
+            <select class="form-control" disabled>
               <option value="1">1 hour</option>
               <option value="2">2 hours</option>
               <option value="3" selected>3 hours</option>
@@ -35,17 +39,18 @@
               <option value="12">12 hours</option>
               <option value="13">13 hours</option>
               <option value="14">14 hours</option>
-            </select>      
+            </select>
           </div>
-          <div class="col-sm-4">
-            <input type="search" name="search" id="txtSearch" class="form-control" placeholder="Enter start location" autofocus disabled/>      
+          
+          <div class="col-sm-3">
+            <button id="btnSubmit" class="btn btn-primary form-control">Go</button>
           </div>
-          <div class="col-sm-2">
-              <button id="btnSubmit" class="btn btn-primary form-control">Go</button>      
-            </div>
+        </div>
       </div>
     </div>
+
     <div id="map"></div>
+    
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>  
