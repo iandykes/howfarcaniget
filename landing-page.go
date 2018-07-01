@@ -8,7 +8,7 @@ import (
 )
 
 type LandingPageViewData struct {
-	GoogleAPIKey string
+	GoogleMapsKey string
 }
 
 // LandingPage is the main UI page
@@ -20,7 +20,7 @@ type LandingPage struct {
 // NewLandingPage creates a new landing page
 func NewLandingPage(env *Environment) *LandingPage {
 	viewData := &LandingPageViewData{
-		GoogleAPIKey: env.GoogleAPIKey,
+		GoogleMapsKey: env.GoogleMapsKey,
 	}
 
 	page := &LandingPage{
