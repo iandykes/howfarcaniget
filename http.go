@@ -14,6 +14,7 @@ type Service struct {
 	HTTPServer *http.Server
 	Mux        *http.ServeMux
 	Distance   *distance
+	Env        *Environment
 }
 
 // NewService creates a new Service with the defined environment settings
@@ -21,10 +22,11 @@ func NewService(env *Environment) *Service {
 	service := &Service{
 		Mux:      createMux(env),
 		Distance: newDistance(env),
+		Env:      env,
 	}
 
-	// TODO: This will change when API is designed
-	service.Mux.Handle("/distances", service.Distance)
+	setupUIRoutes(service)
+	setupAPIRoutes(service)
 
 	service.HTTPServer = &http.Server{
 		Addr: ":" + env.Port,
