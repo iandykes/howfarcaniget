@@ -7,12 +7,13 @@ import (
 )
 
 const (
-	logLevelEnvVarName           = "LOG_LEVEL"
-	portEnvVarName               = "PORT"
-	googleAPIKeyEnvVarName       = "GOOGLE_API_KEY"
-	googleMapsKeyEnvVarName      = "GOOGLE_MAPS_KEY"
-	incDebugHandlersEnvVarName   = "INCLUDE_DEBUG_HANDLERS"
-	httpLoggingEnabledEnvVarName = "HTTP_LOGGING_ENABLED"
+	logLevelEnvVarName               = "LOG_LEVEL"
+	portEnvVarName                   = "PORT"
+	googleAPIKeyEnvVarName           = "GOOGLE_API_KEY"
+	googleMapsKeyEnvVarName          = "GOOGLE_MAPS_KEY"
+	incDebugHandlersEnvVarName       = "INCLUDE_DEBUG_HANDLERS"
+	httpLoggingEnabledEnvVarName     = "HTTP_LOGGING_ENABLED"
+	disableTemplatePreLoadEnvVarName = "DISABLE_TEMPLATE_PRELOAD"
 )
 
 // Environment contains the environment variables for the app
@@ -27,6 +28,8 @@ type Environment struct {
 	// GoogleMapsKey is the HTTP referrer restricted API key for client side maps scripts
 	GoogleMapsKey string
 
+	// TODO: Define a type for bool env vars to reduce this repetition
+
 	// IncDebugHandlers specifies whether to add pprof HTTP endpoints.
 	// Use 0: false, 1: true. Default is false.
 	IncDebugHandlersValue string
@@ -35,6 +38,11 @@ type Environment struct {
 	// HttpLoggingEnabledValue - 0 or 1 for logging HTTP values
 	HTTPLoggingEnabledValue string
 	HTTPLoggingEnabled      bool
+
+	// DisableTemplatePreLoadValue - 0 or 1. Use 1 to reload the template every request.
+	// Useful for dev workflow when changing template contents without an app restart
+	DisableTemplatePreLoadValue string
+	DisableTemplatePreLoad      bool
 }
 
 // NewEnvironment creates an Environment pointer
@@ -64,6 +72,11 @@ func NewEnvironment() *Environment {
 		env.HTTPLoggingEnabled = httpLogging == "1"
 	}
 
+	if disableTemplatePreLoad, hasdisableTemplate := os.LookupEnv(disableTemplatePreLoadEnvVarName); hasdisableTemplate {
+		env.DisableTemplatePreLoadValue = disableTemplatePreLoad
+		env.DisableTemplatePreLoad = disableTemplatePreLoad == "1"
+	}
+
 	env.GoogleMapsKey = os.Getenv(googleMapsKeyEnvVarName)
 	env.GoogleAPIKey = os.Getenv(googleAPIKeyEnvVarName)
 
@@ -73,11 +86,12 @@ func NewEnvironment() *Environment {
 // LogVariables dumps the current variables to log
 func (e *Environment) LogVariables() {
 	log.WithFields(log.Fields{
-		logLevelEnvVarName:           e.LogLevel,
-		portEnvVarName:               e.Port,
-		googleAPIKeyEnvVarName:       e.GoogleAPIKey,
-		googleMapsKeyEnvVarName:      e.GoogleMapsKey,
-		incDebugHandlersEnvVarName:   e.IncDebugHandlersValue,
-		httpLoggingEnabledEnvVarName: e.HTTPLoggingEnabledValue,
+		logLevelEnvVarName:               e.LogLevel,
+		portEnvVarName:                   e.Port,
+		googleAPIKeyEnvVarName:           e.GoogleAPIKey,
+		googleMapsKeyEnvVarName:          e.GoogleMapsKey,
+		incDebugHandlersEnvVarName:       e.IncDebugHandlersValue,
+		httpLoggingEnabledEnvVarName:     e.HTTPLoggingEnabledValue,
+		disableTemplatePreLoadEnvVarName: e.DisableTemplatePreLoadValue,
 	}).Info("Environment variables")
 }
