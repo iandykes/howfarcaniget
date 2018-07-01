@@ -55,8 +55,11 @@ function showTitleCard() {
 $("#btnSubmit").on('click', function () {
     deleteMarkers();
     hideTitleCard();
+
+    var searchValue = $("#txtSearch").val();
+
     // TODO: Get start location and hours selected
-    $.getJSON("/distances", function(result){
+    $.getJSON("/api/distances?s="+searchValue, function(result){
         showResult(result);
     });
 });

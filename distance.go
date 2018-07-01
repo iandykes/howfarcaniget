@@ -33,6 +33,7 @@ type DistanceResponse struct {
 }
 
 // TODO: Come up with a better name and interface signature
+// TODO: Define a fake "distance" implementation to use for testing without calling Distance Matric API
 type distance struct {
 	env *Environment
 }
@@ -46,12 +47,31 @@ func newDistance(env *Environment) *distance {
 }
 
 func (d *distance) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	// TODO: Take originInput from querystring
-	result := d.generateDistances("52.920279,-1.469559")
+
+	queryStringValues := request.URL.Query()
+
+	s := queryStringValues.Get("s")
+	if s == "" {
+		log.WithFields(log.Fields{
+			"queryStringValues": queryStringValues,
+		}).Warn("Missing 's' in query string")
+
+		response.Header().Set("Content-Type", "text/plain")
+		response.WriteHeader(400)
+		response.Write([]byte("Missing 's' query string value [origin]"))
+		return
+	}
+
+	// TODO: Somewhere needs to convert the text the user entered into a lat,long
+
+	// Could use Places API to work that out? Might be better to do that as
+	// a autocomplete drop down in UI in case there are options.
+
+	result := d.generateDistances(s)
 
 	jsonBytes, err := json.Marshal(result)
 	if err != nil {
-		response.Header().Set("Content-Type", "application/json")
+		response.Header().Set("Content-Type", "text/plain")
 		response.WriteHeader(500)
 		response.Write([]byte("Internal error marshalling JSON response"))
 	} else {

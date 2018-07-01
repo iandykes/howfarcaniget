@@ -9,7 +9,8 @@ import (
 
 // LandingPageViewData is the view data passed to the HTML template
 type LandingPageViewData struct {
-	GoogleMapsKey string
+	GoogleMapsKey     string
+	DefaultSearchText string
 }
 
 // LandingPage is the main UI page
@@ -22,6 +23,9 @@ type LandingPage struct {
 func NewLandingPage(env *Environment) *LandingPage {
 	viewData := &LandingPageViewData{
 		GoogleMapsKey: env.GoogleMapsKey,
+
+		// TODO: Maybe set this from env variable, or hard code when in Dev mode
+		DefaultSearchText: "52.920279,-1.469559",
 	}
 
 	page := &LandingPage{
