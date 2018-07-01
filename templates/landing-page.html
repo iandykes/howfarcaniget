@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	  <title>How Far Can I Get?</title>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css">
   </head>
   <body>
     <div class="container-fluid">
@@ -49,10 +49,10 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>  
-    <script src="/js/app.js"></script>
+    <script src="/static/js/app.js"></script>
     
     <!--TODO: Set Key -->
-    <script src="//maps.googleapis.com/maps/api/js?key=REDACTED&callback=initMap"
+    <script src="//maps.googleapis.com/maps/api/js?key={{.GoogleAPIKey}}&callback=initMap"
     async defer></script>
   </body>
 </html>
