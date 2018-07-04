@@ -1,12 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
-	"net/http"
 	"sort"
-	"time"
 
 	"golang.org/x/net/context"
 	"googlemaps.github.io/maps"
@@ -14,77 +11,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// ResultPoint is contains the result for one point in the /distances call
-type ResultPoint struct {
-	Destination       maps.LatLng   `json:"destination,omitempty"`
-	DurationGroup     int           `json:"durationGroup,omitempty"`
-	Status            string        `json:"status,omitempty"`
-	Duration          time.Duration `json:"duration,omitempty"`
-	DurationInTraffic time.Duration `json:"durationInTraffic,omitempty"`
-	DistanceMetres    int           `json:"distanceMetres,omitempty"`
-}
-
-// DistanceResponse is the API response from the /distances call
-type DistanceResponse struct {
-	StatusCode    int           `json:"statusCode,omitempty"`
-	StatusMessage string        `json:"statusMessage,omitempty"`
-	Origin        maps.LatLng   `json:"origin,omitempty"`
-	Points        []ResultPoint `json:"points,omitempty"`
-}
-
+// GoogleDistanceCalculator is a DistanceCalculator that uses Google's Distance Matrix API
 // TODO: Come up with a better name and interface signature
-// TODO: Define a fake "distance" implementation to use for testing without calling Distance Matric API
-type distance struct {
-	env *Environment
+// TODO: Define a fake "distance" implementation to use for testing without calling Distance Matrix API
+type GoogleDistanceCalculator struct {
+	Env *Environment
 }
 
-func newDistance(env *Environment) *distance {
-	distance := &distance{
-		env: env,
-	}
-
-	return distance
-}
-
-func (d *distance) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-
-	queryStringValues := request.URL.Query()
-
-	s := queryStringValues.Get("s")
-	if s == "" {
-		log.WithFields(log.Fields{
-			"queryStringValues": queryStringValues,
-		}).Warn("Missing 's' in query string")
-
-		response.Header().Set("Content-Type", "text/plain")
-		response.WriteHeader(400)
-		response.Write([]byte("Missing 's' query string value [origin]"))
-		return
-	}
-
-	// TODO: Somewhere needs to convert the text the user entered into a lat,long
-
-	// Could use Places API to work that out? Might be better to do that as
-	// a autocomplete drop down in UI in case there are options.
-
-	result := d.generateDistances(s)
-
-	jsonBytes, err := json.Marshal(result)
-	if err != nil {
-		response.Header().Set("Content-Type", "text/plain")
-		response.WriteHeader(500)
-		response.Write([]byte("Internal error marshalling JSON response"))
-	} else {
-		response.Header().Set("Content-Type", "application/json")
-		response.WriteHeader(result.StatusCode)
-		response.Write(jsonBytes)
-	}
-}
-
-func (d *distance) generateDistances(originInput string) DistanceResponse {
-
-	response := DistanceResponse{}
-
+// GetCoordinate gets a Coordinate based on the string origin value
+func (d *GoogleDistanceCalculator) GetCoordinate(originInput string) (Coordinate, error) {
+	// TODO: Temp until work out what the user should enter
 	origin, err := maps.ParseLatLng(originInput)
 	if err != nil {
 
@@ -93,17 +29,23 @@ func (d *distance) generateDistances(originInput string) DistanceResponse {
 			"err":         err,
 		}).Error("Error parsing input")
 
-		response.StatusCode = 400
-		response.StatusMessage = "Error parsing origin"
-
-		return response
+		return Coordinate{}, err
 	}
 
-	response.Origin = origin
-
 	log.WithFields(log.Fields{
-		"origin": origin,
+		"originInput": originInput,
+		"LatLng":      origin,
 	}).Debug("Parsed originInput")
+
+	return toCoordinate(origin), nil
+}
+
+// GenerateDistances makes this type a DistanceCalculator implementation
+func (d *GoogleDistanceCalculator) GenerateDistances(origin Coordinate) DistanceResponse {
+
+	response := DistanceResponse{}
+
+	response.Origin = origin
 
 	rounded := maps.LatLng{}
 	rounded.Lat = float64(int32(origin.Lat*10)) / 10
@@ -150,11 +92,11 @@ func (d *distance) generateDistances(originInput string) DistanceResponse {
 		"gridSize":        gridSize,
 	}).Debug("Calculated grid")
 
-	client, err := maps.NewClient(maps.WithAPIKey(d.env.GoogleAPIKey))
+	client, err := maps.NewClient(maps.WithAPIKey(d.Env.GoogleAPIKey))
 	if err != nil {
 		log.WithFields(log.Fields{
-			"originInput": originInput,
-			"err":         err,
+			"origin": origin,
+			"err":    err,
 		}).Error("Error creating Google API client")
 
 		response.StatusCode = 500
@@ -171,24 +113,25 @@ func (d *distance) generateDistances(originInput string) DistanceResponse {
 
 	r := &maps.DistanceMatrixRequest{}
 
-	r.Origins = []string{originInput}
+	r.Origins = []string{origin.String()}
+
 	r.Destinations = destinations
 	r.DepartureTime = "now"                     // TODO: Allow departure/arrival time
 	r.TrafficModel = maps.TrafficModelBestGuess // TODO: Set this from caller
 
 	log.WithFields(log.Fields{
-		"APIKey":        d.env.GoogleAPIKey,
+		"APIKey":        d.Env.GoogleAPIKey,
 		"DepartureTime": r.DepartureTime,
 		"TrafficModel":  r.TrafficModel,
-		"Origins":       originInput,
+		"Origins":       origin,
 		"Destinations":  len(destinations),
 	}).Debug("Calling DistanceMatrix")
 
 	resp, err := client.DistanceMatrix(context.Background(), r)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"originInput": originInput,
-			"err":         err,
+			"origin": origin,
+			"err":    err,
 		}).Error("Error calling DistanceMatrix")
 
 		response.StatusCode = 500
@@ -203,7 +146,7 @@ func (d *distance) generateDistances(originInput string) DistanceResponse {
 		elem := resp.Rows[0].Elements[i]
 
 		results = append(results, ResultPoint{
-			Destination:       gridPoints[i],
+			Destination:       toCoordinate(gridPoints[i]),
 			Status:            elem.Status,
 			Duration:          elem.Duration,
 			DurationInTraffic: elem.DurationInTraffic,
@@ -216,8 +159,8 @@ func (d *distance) generateDistances(originInput string) DistanceResponse {
 	sort.Slice(results, func(i, j int) bool { return results[i].DurationGroup < results[j].DurationGroup })
 
 	log.WithFields(log.Fields{
-		"originInput": originInput,
-		"results":     results,
+		"origin":  origin,
+		"results": results,
 	}).Debug("Result points")
 
 	response.StatusCode = 200
@@ -236,4 +179,11 @@ func calcDurationGroup(elem *maps.DistanceMatrixElement) int {
 	}
 
 	return int(math.Ceil(duration.Hours()))
+}
+
+func toCoordinate(latlng maps.LatLng) Coordinate {
+	return Coordinate{
+		Lat: latlng.Lat,
+		Lng: latlng.Lng,
+	}
 }

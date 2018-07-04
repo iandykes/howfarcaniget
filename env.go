@@ -14,6 +14,10 @@ const (
 	incDebugHandlersEnvVarName       = "INCLUDE_DEBUG_HANDLERS"
 	httpLoggingEnabledEnvVarName     = "HTTP_LOGGING_ENABLED"
 	disableTemplatePreLoadEnvVarName = "DISABLE_TEMPLATE_PRELOAD"
+	distanceCalculatorEnvVarName     = "DISTANCE_CALCULATOR"
+
+	googleDistanceCalculatorName = "google"
+	testDistanceCalculatorName   = "test"
 )
 
 // Environment contains the environment variables for the app
@@ -43,15 +47,19 @@ type Environment struct {
 	// Useful for dev workflow when changing template contents without an app restart
 	DisableTemplatePreLoadValue string
 	DisableTemplatePreLoad      bool
+
+	// Name of the DistanceCalculator to load. Either google or test. Default google
+	DistanceCalculatorName string
 }
 
 // NewEnvironment creates an Environment pointer
 func NewEnvironment() *Environment {
 	env := &Environment{
-		LogLevel:           "Info",
-		Port:               "80",
-		IncDebugHandlers:   false,
-		HTTPLoggingEnabled: false,
+		LogLevel:               "Info",
+		Port:                   "80",
+		IncDebugHandlers:       false,
+		HTTPLoggingEnabled:     false,
+		DistanceCalculatorName: "google",
 	}
 
 	if level, hasLevel := os.LookupEnv(logLevelEnvVarName); hasLevel {
@@ -60,6 +68,10 @@ func NewEnvironment() *Environment {
 
 	if port, hasPort := os.LookupEnv(portEnvVarName); hasPort {
 		env.Port = port
+	}
+
+	if calc, hasCalc := os.LookupEnv(distanceCalculatorEnvVarName); hasCalc {
+		env.DistanceCalculatorName = calc
 	}
 
 	if incDebugHandlers, hasIncDebug := os.LookupEnv(incDebugHandlersEnvVarName); hasIncDebug {
@@ -93,5 +105,6 @@ func (e *Environment) LogVariables() {
 		incDebugHandlersEnvVarName:       e.IncDebugHandlersValue,
 		httpLoggingEnabledEnvVarName:     e.HTTPLoggingEnabledValue,
 		disableTemplatePreLoadEnvVarName: e.DisableTemplatePreLoadValue,
+		distanceCalculatorEnvVarName:     e.DistanceCalculatorName,
 	}).Info("Environment variables")
 }

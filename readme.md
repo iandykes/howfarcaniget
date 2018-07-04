@@ -16,4 +16,6 @@ Check env.go for full details.  Summary:
   * LOG_LEVEL - Supported values: Debug, Info, Warn, Error.  Default is Info
   * PORT - Default is 80
   * INCLUDE_DEBUG_HANDLERS - 0 or 1. Whether to add pprof HTTP endpoints. Default is 0
-	* HTTP_LOGGING_ENABLED - 0 or 1. Whether to log HTTP calls at Debug level. Default is 0
+  * HTTP_LOGGING_ENABLED - 0 or 1. Whether to log HTTP calls at Debug level. Default is 0
+  * DISABLE_TEMPLATE_PRELOAD - 0 or 1. Default is 0. When 1 template parsing is done on HTTP request, not app start
+  * DISTANCE_CALCULATOR - google or test. Name of calculator to use for the distance API call.  Default google.  Any other string value loads the test calculator
