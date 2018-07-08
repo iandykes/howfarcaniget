@@ -5,13 +5,26 @@ html, body
     padding: 0;
 }
 
+#versionBox
+{
+    position: absolute;
+    width: auto;
+    bottom: 0;
+    z-index: 100;
+    padding: 5px 15px;
+    left: 50%;
+    transform: translate(-50%,0);
+}
+
 #searchAgainBox
 {
     position: absolute;
-    width: 10%;
+    width: auto;
     bottom: 0;
     z-index: 100;
     display: none;
+    left: 50%;
+    transform: translate(-50%,0);
 }
 
 #titleCard 
@@ -21,7 +34,7 @@ html, body
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%)
+    transform: translate(-50%,-50%);
 }
 
 #map 
