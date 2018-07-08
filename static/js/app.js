@@ -2,6 +2,7 @@ var map;
 var markers = [];
 
 function initMap() {
+    // TODO: Geolocation to centre on current location
     map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 52.697, lng: -1.644},
         zoom: 6
@@ -19,6 +20,7 @@ function addMarker(location, label) {
 
 function showResult(result) {
     if (result.statusCode != 200) {
+        // TODO: Feedback on errors
         console.log("Error", result);
         return;
     }
@@ -45,13 +47,16 @@ function deleteMarkers() {
 function hideTitleCard() {
    $("#titleCard").fadeOut();
    $("#searchAgainBox").fadeIn();
+   $("#versionBox").fadeOut();
 }
 
 function showTitleCard() {
     $("#titleCard").fadeIn();
     $("#searchAgainBox").fadeOut();
- }
+    $("#versionBox").fadeIn();
+}
 
+// TODO: Sort out click vs tap
 $("#btnSubmit").on('click', function () {
     deleteMarkers();
     hideTitleCard();
@@ -67,3 +72,7 @@ $("#btnSubmit").on('click', function () {
 $("#btnSearchAgain").click(function(){
     showTitleCard();
 });
+
+$("#btnCloseMainCard").click(function() {
+    hideTitleCard();
+})

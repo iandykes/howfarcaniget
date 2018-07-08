@@ -12,9 +12,17 @@
     <div id="searchAgainBox">
       <button id="btnSearchAgain" class="btn btn-primary">Search again</button>
     </div>
+    <div id="versionBox" class="bg-light text-center border border-info">
+        Version <span id="versionNumber" date-revision="{{.VersionInfo.CommitHash}}" data-date="{{.VersionInfo.BuildDate}}">
+          {{.VersionInfo.Version}}
+        </span>
+    </div>
     
     <div id="titleCard" class="card">
       <div class="card-header">
+        <button id="btnCloseMainCard" type="button" class="close" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
         How Far Can I Get?
       </div>
       <div class="card-body">
@@ -41,12 +49,12 @@
               <option value="14">14 hours</option>
             </select>
           </div>
-          
           <div class="col-sm-3">
             <button id="btnSubmit" class="btn btn-primary form-control">Go</button>
           </div>
         </div>
       </div>
+      
     </div>
 
     <div id="map"></div>
@@ -56,7 +64,6 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>  
     <script src="/static/js/app.js"></script>
     
-    <!--TODO: Set Key -->
     <script src="//maps.googleapis.com/maps/api/js?key={{.GoogleMapsKey}}&callback=initMap"
     async defer></script>
   </body>

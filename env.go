@@ -50,11 +50,15 @@ type Environment struct {
 
 	// Name of the DistanceCalculator to load. Either google or test. Default google
 	DistanceCalculatorName string
+
+	// VersionInfo contains the version details set at build time
+	VersionInfo *VersionInfo
 }
 
 // NewEnvironment creates an Environment pointer
-func NewEnvironment() *Environment {
+func NewEnvironment(version *VersionInfo) *Environment {
 	env := &Environment{
+		VersionInfo:            version,
 		LogLevel:               "Info",
 		Port:                   "80",
 		IncDebugHandlers:       false,
@@ -106,5 +110,6 @@ func (e *Environment) LogVariables() {
 		httpLoggingEnabledEnvVarName:     e.HTTPLoggingEnabledValue,
 		disableTemplatePreLoadEnvVarName: e.DisableTemplatePreLoadValue,
 		distanceCalculatorEnvVarName:     e.DistanceCalculatorName,
+		"VersionInfo":                    e.VersionInfo,
 	}).Info("Environment variables")
 }

@@ -4,9 +4,27 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var (
+	// Set at build time
+
+	// Value of BUILD_BUILDNUMBER
+	version = "dev-version"
+
+	// Date the build was done
+	buildDate = "no-date"
+
+	// Value of BUILD_SOURCEVERSION
+	// Git commit hash for the current repo
+	commitHash = "no-commit"
+)
+
 func main() {
 
-	env := NewEnvironment()
+	env := NewEnvironment(&VersionInfo{
+		version,
+		buildDate,
+		commitHash,
+	})
 	InitialiseLogger(env.LogLevel)
 
 	env.LogVariables()

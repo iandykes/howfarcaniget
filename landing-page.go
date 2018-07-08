@@ -11,6 +11,7 @@ import (
 type LandingPageViewData struct {
 	GoogleMapsKey     string
 	DefaultSearchText string
+	VersionInfo       *VersionInfo
 }
 
 // LandingPage is the main UI page
@@ -23,6 +24,7 @@ type LandingPage struct {
 func NewLandingPage(env *Environment) *LandingPage {
 	viewData := &LandingPageViewData{
 		GoogleMapsKey: env.GoogleMapsKey,
+		VersionInfo:   env.VersionInfo,
 
 		// TODO: Maybe set this from env variable, or hard code when in Dev mode
 		DefaultSearchText: "52.920279,-1.469559",
