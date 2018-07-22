@@ -7,9 +7,10 @@ WORKDIR $GOPATH/src/github.com/iandykes/howfarcaniget
 COPY . ./
 RUN VERSION=${VERSION} COMMIT=${COMMIT} ./build-linux.sh /howfarcaniget 
 
+# TODO: Find out why copying everything to the alpine image doesn't work
 # Could use scratch, but would need certs for https calls to google
-FROM alpine
-COPY --from=builder /howfarcaniget /howfarcaniget/
+#FROM alpine
+#COPY --from=builder /howfarcaniget /howfarcaniget/
 
 ENTRYPOINT ["/howfarcaniget/app"]
 
